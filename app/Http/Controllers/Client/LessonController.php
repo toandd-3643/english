@@ -13,6 +13,8 @@ use App\Models\GrammarLesson;
 use App\Models\Flashcard;
 use App\Models\Quiz;
 use App\Models\QuizQuestion;
+use App\Imports\LessonImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class LessonController extends Controller
 {
@@ -358,5 +360,65 @@ class LessonController extends Controller
                 'message' => 'Có lỗi xảy ra: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function importForm()
+    {
+        if (Auth::user()->role !== 'admin') {
+            return redirect()->back()->with('error', 'Bạn không có quyền truy cập chức năng này!');
+        }
+
+        $vocabularyCategories = Category::where('type', 'vocabulary')->get();
+        $grammarCategories = Category::where('type', 'grammar')->get();
+
+        return view('client.lesson.import', compact('vocabularyCategories', 'grammarCategories'));
+    }
+
+    public function import(Request $request)
+    {
+        if (Auth::user()->role !== 'admin') {
+            return response()->json(['success' => false, 'message' => 'Bạn không có quyền thực hiện thao tác này!'], 403);
+        }
+
+        $request->validate([
+            'excel_file' => 'required|mimes:xlsx,xls,csv|max:5120',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            // Reset static lesson ID
+            \App\Imports\LessonInfoSheet::$lessonId = null;
+
+            Excel::import(new LessonImport, $request->file('excel_file'));
+
+            $lessonId = \App\Imports\LessonInfoSheet::$lessonId;
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Import lesson thành công!',
+                'lesson_id' => $lessonId,
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Có lỗi xảy ra: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function downloadTemplate()
+    {
+        $filePath = public_path('templates/lesson_import_template.xlsx');
+        
+        if (!file_exists($filePath)) {
+            return response()->json(['error' => 'Template file not found'], 404);
+        }
+
+        return response()->download($filePath, 'lesson_template.xlsx');
     }
 }

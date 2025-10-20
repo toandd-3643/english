@@ -4,6 +4,30 @@
 
 @push('styles')
 <style>
+    .btn-import {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 10px;
+        transition: all 0.3s;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        text-decoration: none;
+    }
+
+    .btn-import:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+
     .create-lesson-page {
         background: #f8f9fa;
         min-height: 100vh;
@@ -386,6 +410,15 @@
                     <label class="form-label">Image URL</label>
                     <input type="url" class="form-control" name="image_url" 
                            placeholder="https://example.com/image.jpg">
+                </div>
+
+                <div class="mb-3">
+                    <a href="{{ route('client.lessons.import') }}" class="btn-import">
+                        <i class="fas fa-file-import"></i> Import from File
+                    </a>
+                    <small class="text-muted d-block mt-2">
+                        📄 Import lessons from Excel or CSV file
+                    </small>
                 </div>
             </div>
 

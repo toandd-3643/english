@@ -6,6 +6,7 @@ use App\Http\Controllers\Client\VocabularyController;
 use App\Http\Controllers\Client\GrammarController;
 use App\Http\Controllers\Client\FlashcardController;
 use App\Http\Controllers\Client\LessonController;
+use App\Http\Controllers\Client\LessonTemplateController;
 use App\Http\Controllers\Client\QuizController;
 use App\Http\Controllers\Client\TranslationController;
 use App\Http\Controllers\Client\ProfileController;
@@ -29,6 +30,9 @@ Route::name('client.')->group(function () {
             Route::post('/store/lesson', [LessonController::class, 'store'])->name('store');
             Route::get('/{id}/edit', [LessonController::class, 'edit'])->name('edit');
             Route::put('/{id}/update', [LessonController::class, 'update'])->name('update');
+            Route::get('/import/file', [LessonController::class, 'importForm'])->name('import.form');
+            Route::post('/import/file', [LessonController::class, 'import'])->name('import');
+            Route::get('/template/download', [LessonTemplateController::class, 'generate'])->name('template.download');
         });
     });
 
